@@ -8,7 +8,6 @@ export const authmiddleware = (req, res, next) => {
             message: "No token provided"
         });
     }
-    
     try{
         const {data} = jwt.verify(token, 'secret');
         if(!data) return res.status(401).send({
@@ -19,6 +18,7 @@ export const authmiddleware = (req, res, next) => {
         req.body.role = "the given role"
         next(); 
     }catch(err){
+        console.log(err.message);
         res.status(400).send({
             success: false,
             message: err.message,

@@ -7,9 +7,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      
     },
-    password: String,
+    ownerId: {
+      type: String,
+      default: null,
+    },
     role: {
       type: String,
       default: "user",
@@ -18,15 +20,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "email",
     },
-    verified: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
     timestamps: true,
   }
 );
 
-
-export default mongoose.model("users", userSchema)
+export const User = mongoose.model("users", userSchema);

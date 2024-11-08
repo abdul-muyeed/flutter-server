@@ -1,52 +1,39 @@
 import mongoose from "mongoose";
 
-
-const resturantSchema = new mongoose.Schema({
+const resturantSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+    },
+    ownerId: {
+      type: String,
     },
     image: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
     },
     location: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
     },
     phone: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
     },
     address: {
-        type: String,
-        required: true, 
+      type: String,
     },
     rating: {
-        type: Number,
-        required: true,
+      type: Number,
     },
     verified: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model("Resturant", resturantSchema);
+export const Resturant = mongoose.model("Resturant", resturantSchema);

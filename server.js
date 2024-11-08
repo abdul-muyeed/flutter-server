@@ -5,11 +5,13 @@ import cors from "cors";
 import morgan from "morgan";
 import { authmiddleware } from "./middlewares/auth.js";
 import { MongoDB } from "./configs/DBconnection.js";
-import User from "./models/user.js";
-import Resturant from "./models/resturant.js";
+import {User} from "./models/user.js";
+import { Resturant } from "./models/resturant.js";
 import resturantData from "./data/resturant.js";
+import orderData from "./data/order.js";
 import { comparePassword, hashPassword } from "./configs/hashPassword.js";
 import jwt from "jsonwebtoken";
+import { Order } from "./models/order.js";
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -44,6 +46,7 @@ app.get("/resturant", async (req, res) => {
   }
 });
 
+
 app.post("/user/register", async (req, res) => {
   try {
     console.log(req.body);
@@ -76,7 +79,7 @@ app.post("/user/login", async (req, res) => {
     const user = await User.findOne({email: req.body.email}).select("-__v -createdAt -updatedAt ");
     if(!user) return res.status(404).send({ success: false, message: "User not found"});
 
-    const token = jwt.sign({data:user}, 'secret',{expiresIn: '1h'});
+    const token = jwt.sign({data:user}, 'secret',{expiresIn: '24h'});
     console.log(user);
     if(req.body.provider.toString() === "google") return res.status(200).send({success: true, message: "Login successful", token, data: user});
     if(user.password === null) return res.status(401).send({success: false, message: "Invalid credentials"});
@@ -98,11 +101,20 @@ app.post("/user/login", async (req, res) => {
     });
   }
 });
-app.get("/user", authmiddleware, async (req, res) => {
+app.post("/user", authmiddleware, async (req, res) => {
   try {
+    const user = await User.findOne({email: req.body.email}).select("-__v -createdAt -updatedAt ");
+    if(!user) return res.status(404).send({ success: false, message: "User not found"});
+
+    const {password, ...others} = user.toObject();
+    res.status(200).send({
+      success: true,
+      message: "User fetched successfully",
+      data: others
+    });
+
     
-    
-    return res.status(200).send({success: true, data: req.body});
+   
   } catch (err) {
     console.log(err.message);
     res.status(500).send({
@@ -111,6 +123,23 @@ app.get("/user", authmiddleware, async (req, res) => {
     });
   }
 });
+
+app.get('/orders',async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.status(200).send({
+      success: true,
+      message: "Orders fetched successfully",
+      data: orders
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+})
 
 
 
@@ -124,6 +153,15 @@ if(false){
   try {
     const result = await Resturant.insertMany(resturantData);
     console.log('All restaurant data inserted successfully');
+  } catch (err) {
+    console.error(err);
+  }
+    
+}
+if(false){
+  try {
+    const result = await Order.insertMany(orderData);
+    console.log('All user data inserted successfully');
   } catch (err) {
     console.error(err);
   }
