@@ -10,14 +10,21 @@ const reviewSchema = new mongoose.Schema({
     resturantName: {
         type: String,
     },
+    customerName: {
+        type: String,
+    },
     customerId: {
         type: String,
     },
     rating: {
         type: Number,
+        default: 0.00,
+        min: 0,
+        max: 5,
     },
     comment: {
         type: String,
+        default: "",
     },
     status: {
         type: String,

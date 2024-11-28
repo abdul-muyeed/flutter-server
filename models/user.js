@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    photoUrl: {
+      type: String,
+      default: null,
+    },
     ownerId: {
       type: String,
       default: null,
@@ -16,10 +20,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
-    provider: {
-      type: String,
-      default: "email",
-    },
+    balance:{
+      type: Number,
+      default: 0.00,
+    }
+    
   },
   {
     timestamps: true,

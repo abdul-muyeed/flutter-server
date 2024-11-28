@@ -10,9 +10,11 @@ const orderSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
+      default: 0.00,
     },
     comment: {
       type: String,
+      default: null,
     },
     status: {
       type: String,
@@ -22,6 +24,12 @@ const orderSchema = new mongoose.Schema(
       type: String,
     },
     customerId: {
+      type: String,
+    },
+    meal: {
+      type: String,
+    },
+    day: {
       type: String,
     },
     orderDate:{

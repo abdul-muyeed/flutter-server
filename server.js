@@ -12,6 +12,8 @@ import orderData from "./data/order.js";
 import { comparePassword, hashPassword } from "./configs/hashPassword.js";
 import jwt from "jsonwebtoken";
 import { Order } from "./models/order.js";
+import { Favorite } from "./models/favorite.js";
+import { Review } from "./models/review.js";
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -45,25 +47,35 @@ app.get("/resturant", async (req, res) => {
     });
   }
 });
+app.get("/resturant/:id", async (req, res) => {
+  try {
+    const resturant = await Resturant.findById(req.params.id);
+    res.status(200).send({
+      success: true,
+      message: "Resturant fetched successfully",
+      data: resturant,
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+})
 
 
 app.post("/user/register", async (req, res) => {
   try {
     console.log(req.body);
-    const user = {...req.body, name: req.body.name.toLowerCase().replace(/\s+/g, '') };
-    if(req.body.password) user.password = await hashPassword(req.body.password);
-    if(req.body.provider) user.provider = req.body.provider;
-    if(req.body.verified) user.verified = req.body.verified;
-    if(await User.findOne({email: user.email})) return res.status(409).send({success: false, message: "User already exists"});
+    const user = req.body;
+    user.name = user.name.toLowerCase();
     const newUser = new User(user);
-    const token = jwt.sign({data:newUser}, 'secret',{expiresIn: '1h'});
-    const {password, ...others} = newUser.toObject();
     await newUser.save();
     res.status(201).send({
       success: true,
       message: "User created successfully",
-      token: token,
-      data: others,});
+      data: newUser,});
   } catch (err) {
     console.log(err.message);
     res.status(500).send({
@@ -101,17 +113,17 @@ app.post("/user/login", async (req, res) => {
     });
   }
 });
-app.post("/user", authmiddleware, async (req, res) => {
+app.get("/user", async (req, res) => {
   try {
     const user = await User.findOne({email: req.body.email}).select("-__v -createdAt -updatedAt ");
     if(!user) return res.status(404).send({ success: false, message: "User not found"});
 
-    const {password, ...others} = user.toObject();
     res.status(200).send({
       success: true,
       message: "User fetched successfully",
-      data: others
+      data: user
     });
+
 
     
    
@@ -123,10 +135,52 @@ app.post("/user", authmiddleware, async (req, res) => {
     });
   }
 });
+app.put("/user/:id", async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true});
+    res.status(200).send({
+      success: true,
+      message: "User updated successfully",
+      data: user
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+})
+
+app.post("/resturant", async (req, res) => {
+  try {
+    const resturant = new Resturant(req.body);
+    const user = await User.findById(req.body.ownerId);
+    user.ownerId = resturant._id;
+    user.role = "owner";
+
+    await resturant.save();
+    await user.save();
+    res.status(201).send({
+      success: true,
+      message: "Resturant created successfully",
+      data: resturant
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+
+})
 
 app.get('/orders',async (req, res) => {
   try {
-    const orders = await Order.find();
+    console.log(req.body);
+    const orders = await Order.find(req.body);
+    console.log(orders);
     res.status(200).send({
       success: true,
       message: "Orders fetched successfully",
@@ -140,6 +194,195 @@ app.get('/orders',async (req, res) => {
     });
   }
 })
+
+app.post('/order', async (req, res) => {
+  try {
+    console.log(req.body);
+    const order = new Order(req.body);
+    
+    const user =  await User.findById(req.body.customerId);
+    user.balance -= (req.body.price*req.body.quantity);
+    const resturant = await Resturant.findById(req.body.ownerId);
+
+    resturant.seats[req.body.day][req.body.meal].bookings += req.body.quantity;
+    resturant.balance += (req.body.price*req.body.quantity);
+
+    await user.save();
+     await order.save();
+    await resturant.save();
+    res.status(201).send({
+      success: true,
+      message: "Order created successfully",
+      data: order
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+})
+app.put('/order/:id', async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(req.params.id, req.body, {new: true});
+    res.status(200).send({
+      success: true,
+      message: "Order updated successfully",
+      data: order
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+})
+app.post('/review', async (req, res) => {
+  try {
+    console.log(req.body);
+    const review = new Review(req.body);
+    
+    await review.save();
+    res.status(201).send({
+      success: true,
+      message: "Review created successfully",
+      data: review
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+
+});
+app.get('/review', async (req, res) => {
+  try {
+    console.log(req.body);
+    const reviews = await Review.find(req.body);
+    console.log(reviews);
+    res.status(200).send({
+      success: true,
+      message: "Reviews fetched successfully",
+      data: reviews
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+});
+app.put('/review/:id', async (req, res) => {
+  try {
+    const review = await Review.findByIdAndUpdate(req.params.id, req.body, {new: true});
+    res.status(200).send({
+      success: true,
+      message: "Review updated successfully",
+      data: review
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+  
+})
+app.put('/order/reject/:id', async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(req.params.id, {status: "Rejected"}, {new: true});
+    const resturant = await Resturant.findById(order.ownerId);
+    resturant.seats[order.day][order.meal].bookings -= order.quantity;
+    resturant.balance -= order.price;
+    const user = await User.findById(order.customerId);
+    user.balance += order.price;
+    await user.save();
+    await resturant.save();
+    res.status(200).send({
+      success: true,
+      message: "Order rejected successfully",
+      data: order
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+});
+app.get('/resturant/status/:id', async (req, res) => {
+  try {
+    const resturant = await Resturant.findById(req.params.id);
+    let seats = resturant.seats[req.body.day][req.body.meal].total - resturant.seats[req.body.day][req.body.meal].bookings;
+    if (seats <= 0) seats = 0;
+
+    res.status(200).send({
+      success: true,
+      message: "Resturant status fetched successfully",
+      data: seats
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+});
+
+app.post('/favorite', authmiddleware, async (req, res) => {
+  try {
+    console.log(req.body);
+    const user = await Favorite.findOne({email: req.body.email});
+    if(!user){
+      const favorite = new  Favorite({email: req.body.email, favorites: [req.body.resturantId]});
+      await favorite.save();
+      return res.status(201).send({
+        success: true,
+        message: "Favorite added successfully",
+        data: favorite
+      });
+    }else{
+      user.favorites.push(req.body.resturantId);
+      await user.save();
+      return res.status(200).send({
+        success: true,
+        message: "Favorite added successfully",
+        data: user
+      });
+    }
+    
+  } catch (err) {
+      console.log(err.message);
+    }
+})
+
+app.put('/resturant/:id', async (req, res) => {
+  try {
+    const user = await Resturant.findByIdAndUpdate(req.params.id, req.body);
+    res.status(200).send({
+      success: true,
+      message: "Resturant updated successfully",
+      data: user
+    });
+
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send({
+      success: false,
+      message: err.message
+    });
+  }
+}
+)
+
 
 
 

@@ -25,10 +25,238 @@ const resturantSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
+      default: 0.00,
     },
-    verified: {
-      type: Boolean,
-      default: false,
+    balance:{
+      type: Number,
+      default: 0.00,
+
+    },
+    seats: {
+      friday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      saturday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      sunday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      monday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      tuesday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      wednesday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
+      thursday: {
+        breakfast: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        lunch: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+        dinner: {
+          bookings: {
+            type: Number,
+            default: 0,
+          },
+          total: {
+            type: Number,
+            default: 0,
+          },
+        },
+      },
     },
   },
   {
